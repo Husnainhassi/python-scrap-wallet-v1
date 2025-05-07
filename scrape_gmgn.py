@@ -26,7 +26,8 @@ def get_roi_winrate(wallet_address):
         # WINRATE
         winrate_value = 0
         try:
-            winrate_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-1vihibg")))
+            # winrate_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-1vihibg")))
+            winrate_element = driver.find_element(By.XPATH, "//*[text()='Win Rate']/following-sibling::div[1]")
             winrate_text = winrate_element.text.strip()
             winrate_value = winrate_text.replace("%", "")
             print('Winrate =>', winrate_value)
@@ -41,6 +42,7 @@ def get_roi_winrate(wallet_address):
         if roi_element:
             roi_text = roi_element.text.strip() 
             roi_value = roi_text.split('%')[0] + '%'
+            roi_value = roi_value.replace("+", "").replace("%", "")  # Remove + and % signs
             print('ROI =>', roi_value) 
         else:
             print("ROI not found")

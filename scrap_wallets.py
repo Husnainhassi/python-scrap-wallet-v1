@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
+import uuid
 from scrape_gmgn import get_roi_winrate
 import time
 
@@ -32,7 +33,7 @@ def collect_traders_from_birdeye(token_address):
     try:
 
         # wait for full page load
-        time.sleep(3)
+        time.sleep(2)
 
         # Close popup if appears
         try:
@@ -46,7 +47,7 @@ def collect_traders_from_birdeye(token_address):
 
         print("Waiting for manual filter...")
         # Wait for manual filter
-        time.sleep(25)
+        time.sleep(50)
         print("Manual filter applying time ended.")
 
         pages_ended = 0
@@ -125,13 +126,15 @@ def collect_traders_from_birdeye(token_address):
     return traders_data
 
 if __name__ == "__main__":
-    token_address = 'C8AjmccYUd5gYf8nf5KKYgr3zDNJ6UDHVVi312a2pump'
+    token_address = 'FZRh6uAar3gEJb53ruHNjHibCPqiGHghfGiSRVeFpump'
     traders_info = collect_traders_from_birdeye(token_address)
 
     if traders_info:
+        unique_id = uuid.uuid4().hex[:8]
         df = pd.DataFrame(traders_info)
-        df.to_excel("traders_with_roi.xlsx", index=False)
-        print(f"Saved {len(traders_info)} traders with ROI and Winrate to 'traders_with_roi.xlsx'.")
+        filename = f"traders_with_roi_{unique_id}.xlsx"
+        df.to_excel(filename, index=False)
+        print(f"Saved {len(traders_info)} traders with ROI and Winrate to {filename}.")
     else:
         print("No trader links were collected.")
 
