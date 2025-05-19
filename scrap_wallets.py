@@ -47,7 +47,7 @@ def collect_traders_from_birdeye(token_address):
 
         print("Waiting for manual filter...")
         # Wait for manual filter
-        time.sleep(50)
+        time.sleep(5)
         print("Manual filter applying time ended.")
 
         pages_ended = 0
@@ -72,12 +72,15 @@ def collect_traders_from_birdeye(token_address):
                     if trader_link:
                         trader_address = trader_link.split("/profile/")[1].split("?")[0]
                         stats = get_roi_winrate(trader_address)
-                        traders_data.append({
-                            "Trader": trader_address,
-                            "ROI": stats['roi'],
-                            "Winrate": stats['winrate']
-                        })
-                        print(f"Collected: {trader_address} |")
+                        if stats['roi'] > 25 and stats['winrate'] > 60:
+                            traders_data.append({
+                                "Trader": trader_address,
+                                "ROI": stats['roi'],
+                                "Winrate": stats['winrate']
+                            })
+                            print(f"Collected: {trader_address}")
+                        else:
+                            print(f"Ignored: {trader_address}")
                 except:
                     print(f"Error processing row: {e}")
                     traders_data.append({
@@ -126,14 +129,14 @@ def collect_traders_from_birdeye(token_address):
     return traders_data
 
 if __name__ == "__main__":
-    token_address = 'FZRh6uAar3gEJb53ruHNjHibCPqiGHghfGiSRVeFpump'
+    token_address = '8jMPc4ZH4G7CfSYAERzEE6jHX4RUXhKJaXjNnLjTpump'
     traders_info = collect_traders_from_birdeye(token_address)
 
     if traders_info:
         unique_id = uuid.uuid4().hex[:8]
         df = pd.DataFrame(traders_info)
         filename = f"traders_with_roi_{unique_id}.xlsx"
-        df.to_excel(filename, index=False)
+        df.to_excel(filename, index=False, engine='openpyxl')
         print(f"Saved {len(traders_info)} traders with ROI and Winrate to {filename}.")
     else:
         print("No trader links were collected.")
